@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/loginLayout"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:visibility="gone">
+
+
+    <EditText
+        android:id="@+id/room"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="房间"
+        android:text="default"/>
+
+    <Button
+        android:id="@+id/toCropActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="每个人的视频存在各自view里面"/>
+
+
+    <!--<Button-->
+        <!--android:id="@+id/toOnlyOneView"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="10pt"-->
+        <!--android:text="所有的人共享于一个视频view里面"/>-->
+
+</LinearLayout>

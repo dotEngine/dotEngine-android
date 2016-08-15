@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+    <!--<android.opengl.GLSurfaceView-->
+    <!--android:id="@+id/video"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_weight="1"/>-->
+    <FrameLayout
+        android:id="@+id/viewLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/scrollViewLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            >
+
+
+            <!--<EditText-->
+            <!--android:id="@+id/room"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="hai046Room"/>-->
+
+            <Button
+                android:id="@+id/btnSwitchCamera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="切换摄像头"/>
+
+            <Button
+                android:id="@+id/btnSwitchEnableVideo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="关闭本地视频"/>
+
+
+            <Button
+                android:id="@+id/btnSwitchEnableAudio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="关闭本地音频"/>
+
+            <Button
+                android:id="@+id/speakerphoneOn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="关闭扬声器"/>
+
+            <LinearLayout
+                android:id="@+id/parentLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                ></LinearLayout>
+            <!--<Button-->
+            <!--android:id="@+id/btnStart"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="切换摄像头"/>-->
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <Button
+        android:id="@+id/joinRoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/scrollViewLayout"
+        android:layout_centerHorizontal="true"
+        android:text="加入房间"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/joinRoom"/>
+</RelativeLayout>
