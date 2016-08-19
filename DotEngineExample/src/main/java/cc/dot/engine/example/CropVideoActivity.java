@@ -216,7 +216,7 @@ public class CropVideoActivity extends Activity {
                 });
 
 
-        instance.setupVideoProfile(DotRTCEngineVideoProfileType.RTCEngine_VideoProfile_360P);
+        instance.setupVideoProfile(DotRTCEngineVideoProfileType.DotEngine_VideoProfile_360P);
 
 
         instance.startInit();

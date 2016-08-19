@@ -31,8 +31,6 @@ allprojects {
 
 dependencies {
     compile(name:'DotEngine-release', ext:'aar')
-    compile 'com.alibaba:fastjson:1.2.12'
-    compile 'io.pristine:libjingle:11139@aar'
     compile 'com.android.support:appcompat-v7:22.0.0'
 
 
