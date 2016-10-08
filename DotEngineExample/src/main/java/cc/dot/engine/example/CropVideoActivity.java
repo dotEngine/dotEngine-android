@@ -57,7 +57,7 @@ public class CropVideoActivity extends Activity {
         findViewById(R.id.joinRoom).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((Button) v).setText(v.getTag() != null ? "加入房间" : "离开房间");
+                ((Button) v).setText(v.getTag() != null ? "join room" : "leave room");
                 if (v.getTag() == null) {
                     initView();
                 } else {
@@ -94,7 +94,7 @@ public class CropVideoActivity extends Activity {
             public void onClick(View v) {
 
                 DotEngine.getInstance().enableVideo(v.getTag() != null);
-                ((Button) v).setText(v.getTag() == null ? "开启视频" : "关闭视频");
+                ((Button) v).setText(v.getTag() == null ? "enable video" : "disable video");
                 v.setTag(v.getTag() == null ? true : null);
 
             }
@@ -106,7 +106,7 @@ public class CropVideoActivity extends Activity {
             public void onClick(View v) {
 
                 DotEngine.getInstance().enableAudio(v.getTag() != null);
-                ((Button) v).setText(v.getTag() == null ? "开启音频" : "关闭音频");
+                ((Button) v).setText(v.getTag() == null ? "enable audio" : "disable audio");
                 v.setTag(v.getTag() == null ? true : null);
 
             }
@@ -117,7 +117,7 @@ public class CropVideoActivity extends Activity {
             @Override
             public void onClick(View v) {
                 DotEngine.getInstance().enableSpeakerphone(v.getTag() != null);
-                ((Button) v).setText(v.getTag() == null ? "开启扬声器" : "关闭扬声器");
+                ((Button) v).setText(v.getTag() == null ? "enable speakerphone" : "disable speakerphone");
                 v.setTag(v.getTag() == null ? true : null);
             }
         });
@@ -160,12 +160,12 @@ public class CropVideoActivity extends Activity {
 
                     @Override
                     public void onEnableAudio(boolean enable, String user) {
-                        showToast(user + "音频 " + (enable ? "打开:" : "关闭"));
+                        showToast(user + " audio  " + (enable ? " enable :" : " disable "));
                     }
 
                     @Override
                     public void onEnableVideo(boolean enable, String user) {
-                        showToast(user + "视频 " + (enable ? "打开:" : "关闭"));
+                        showToast(user + " video " + (enable ? " enable :" : " disable "));
 
 
                     }
@@ -178,11 +178,11 @@ public class CropVideoActivity extends Activity {
                         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 
                         int size = videoLayout.getChildCount();
-                        int pw = (int) (displayMetrics.widthPixels * 0.33f);
+                        int pw = (int) (displayMetrics.widthPixels * 0.5f);
                         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(pw, pw);
 
-                        layoutParams.leftMargin = (size % 3) * pw;
-                        layoutParams.topMargin = (size / 3) * pw;
+                        layoutParams.leftMargin = (size % 2) * pw;
+                        layoutParams.topMargin = (size / 2) * pw;
 
                         videoLayout.addView(view, layoutParams);
 
@@ -264,7 +264,7 @@ public class CropVideoActivity extends Activity {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 
         int size = videoLayout.getChildCount();
-        int pw = (int) (displayMetrics.widthPixels * 0.33f);
+        int pw = (int) (displayMetrics.widthPixels * 0.5f);
 
 
 
@@ -273,8 +273,8 @@ public class CropVideoActivity extends Activity {
 
             FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(pw, pw);
 
-            layoutParams.leftMargin = (i % 3) * pw;
-            layoutParams.topMargin = (i / 3) * pw;
+            layoutParams.leftMargin = (i % 2) * pw;
+            layoutParams.topMargin = (i / 2) * pw;
 
             videoLayout.updateViewLayout(view,layoutParams);
 

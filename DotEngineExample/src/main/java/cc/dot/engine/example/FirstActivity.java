@@ -16,11 +16,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
-
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 import cc.dot.engine.DotEngine;
@@ -112,20 +109,21 @@ public class FirstActivity extends Activity {
                 if (TextUtils.isEmpty(value)) {
                     return null;
                 }
-                RtcResponse<String> rtcResponse = JSON.parseObject(value, RtcResponse.type(String.class));
-
-                JSONObject response = JSON.parseObject(value);
 
 
+                try {
+                    JSONObject response = new JSONObject(value);
 
-                if (ResponseUtils.isOkAndHasData(rtcResponse)) {
+                    JSONObject dataObject = response.getJSONObject("d");
 
-                    String d = rtcResponse.getD();
-                    JSONObject jsonObject = JSON.parseObject(d);
+                    return dataObject.getString("token");
 
-                    return jsonObject.getString("token");
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return  null;
                 }
-                return null;
+
             }
 
             @Override
