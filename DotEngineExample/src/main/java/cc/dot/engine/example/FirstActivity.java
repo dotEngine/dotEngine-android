@@ -12,6 +12,7 @@ import android.widget.Toast;
 import android.widget.TextView;
 
 
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -21,11 +22,15 @@ import org.json.JSONObject;
 
 
 import cc.dot.engine.DotEngine;
+import cc.dot.engine.listener.TokenCallback;
 import cc.dot.engine.mode.DotEngineStatus;
 import cc.dot.engine.mode.RtcResponse;
 import cc.dot.engine.utils.DotEngineUtils;
 import cc.dot.engine.utils.NetUtils;
 import cc.dot.engine.utils.ResponseUtils;
+
+
+
 
 
 
@@ -37,11 +42,12 @@ public class FirstActivity extends Activity {
 
     private String  mRoom;
 
+    private String  mUserid;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        String host = "182.92.152.61:8000";
-
 
         setContentView(R.layout.login);
 
@@ -80,13 +86,24 @@ public class FirstActivity extends Activity {
 
                     mRoom = mRooText.getText().toString();
 
-                    getToken(new CallBack() {
+                    mUserid = "android-" + Build.DEVICE + new Random().nextInt(10000);
+
+
+
+
+                    DotEngine.getInstance().generateTestToken(DotEngineConfig.APP_KEY, DotEngineConfig.APP_SECRET, mRoom, mUserid, new TokenCallback() {
                         @Override
                         public void onSuccess(String token) {
+
                             Intent intent = new Intent(FirstActivity.this, CropVideoActivity.class);
                             intent.putExtra("token", token);
                             startActivity(intent);
                             finish();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Toast.makeText(FirstActivity.this, "获取token失败", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -100,49 +117,6 @@ public class FirstActivity extends Activity {
         }
     }
 
-    private void getToken(final CallBack callBack) {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-
-                String value = NetUtils.getValue(String.format("http://182.92.152.61:5001/getToken?room=%s&user_id=%s", mRoom, Build.DEVICE.toString() + ThreadLocalRandom.current().nextInt(1,1000)));
-                if (TextUtils.isEmpty(value)) {
-                    return null;
-                }
-
-
-                try {
-                    JSONObject response = new JSONObject(value);
-
-                    JSONObject dataObject = response.getJSONObject("d");
-
-                    return dataObject.getString("token");
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    return  null;
-                }
-
-            }
-
-            @Override
-            protected void onPostExecute(final String s) {
-                if (TextUtils.isEmpty(s)) {
-                    Toast.makeText(FirstActivity.this, "token 获取失败", Toast.LENGTH_SHORT).show();
-
-                    return;
-                }
-                callBack.onSuccess(s);
-
-
-            }
-        }.execute();
-    }
-
-    interface CallBack {
-        void onSuccess(String token);
-    }
 
     @Override
     protected void onPause() {

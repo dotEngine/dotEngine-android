@@ -15,14 +15,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cc.dot.engine.DotEngine;
+import cc.dot.engine.Engine;
 import cc.dot.engine.listener.DotEngineListener;
 import cc.dot.engine.type.DotEngineErrorType;
-import cc.dot.engine.type.DotRTCEngineVideoProfileType;
+import cc.dot.engine.type.DotEngineVideoProfileType;
+import cc.dot.engine.type.DotEngineWarnType;
 
-
-/**
- * Created by haizhu on 16/5/21.
- */
 
 public class CropVideoActivity extends Activity {
 
@@ -65,11 +63,15 @@ public class CropVideoActivity extends Activity {
                     linearLayout.setVisibility(View.GONE);
                     linearLayout.removeAllViews();
                     videoLayout.removeAllViews();
+
+                    DotEngine.getInstance().stopLocalMedia();
                 }
 
                 v.setTag(v.getTag() == null ? true : null);
             }
         });
+
+        //DotEngine.getInstance().setCaptureMode(DotEngine.DotEngineCaptureMode.DotEngine_Capture_Default);
 
     }
 
@@ -126,13 +128,12 @@ public class CropVideoActivity extends Activity {
     }
 
     private void initAndStartPreview() {
-        DotEngine instance = DotEngine.getInstance();
-        instance.sharedInstanceWithListener(this,
+        DotEngine.getInstance().sharedInstanceWithListener(this,
                 new DotEngineListener() {
                     @Override
                     public void onJoined(final String user) {
                         showToast(user + " join room  可以拖动视频看看效果");
-                        if (user.equals(DotEngine.getInstance().currentUser())) {
+                        if (user.equals(DotEngine.getInstance().getCurrentUser())) {
                             return;
                         }
 
@@ -150,10 +151,15 @@ public class CropVideoActivity extends Activity {
                         showToast("" + errorType);
                     }
 
+                    @Override
+                    public void onWarning(DotEngineWarnType dotEngineWarnType) {
+
+                    }
+
 
                     @Override
                     public void onInitPrepared() {
-                        DotEngine.getInstance().startPreview();
+                        DotEngine.getInstance().startLocalMedia();
                         DotEngine.getInstance().joinRoom(token);
                     }
 
@@ -171,55 +177,41 @@ public class CropVideoActivity extends Activity {
                     }
 
                     @Override
-                    public void onAddVideoView(String user, SurfaceView view) {
+                    public void onAddLocalView(SurfaceView surfaceView) {
 
-
-                        //九宫格布局
-                        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-
-                        int size = videoLayout.getChildCount();
-                        int pw = (int) (displayMetrics.widthPixels * 0.5f);
-                        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(pw, pw);
-
-                        layoutParams.leftMargin = (size % 2) * pw;
-                        layoutParams.topMargin = (size / 2) * pw;
-
-                        videoLayout.addView(view, layoutParams);
-
+                        addVideo(null,surfaceView);
                     }
 
                     @Override
-                    public void onRemoveVideoView(String user, SurfaceView view) {
-                        videoLayout.removeView(view);
+                    public void onAddRemoteView(String s, SurfaceView surfaceView) {
+
+                        addVideo(s, surfaceView);
+                    }
+
+                    @Override
+                    public void onRemoveLocalView(SurfaceView surfaceView) {
+
+                        videoLayout.removeView(surfaceView);
 
                         updateFrameLayout();
-
                     }
-
 
                     @Override
-                    public void onAddStream(String user) {
-                        super.onAddStream(user);
+                    public void onRemoveRemoteView(String s, SurfaceView surfaceView) {
 
-                        // 有一个stream 添加进来了
+                        videoLayout.removeView(surfaceView);
+
+                        updateFrameLayout();
                     }
 
 
-                    @Override
-                    public void onRemoveStream(String user) {
-                        super.onRemoveStream(user);
-
-                        // 有一个stream 被删除掉了
-
-
-                    }
                 });
 
 
-        instance.setupVideoProfile(DotRTCEngineVideoProfileType.DotEngine_VideoProfile_360P);
+        DotEngine.getInstance().setupVideoProfile(DotEngineVideoProfileType.DotEngine_VideoProfile_360P);
 
+        DotEngine.getInstance().startInit();
 
-        instance.startInit();
     }
 
 
@@ -239,21 +231,40 @@ public class CropVideoActivity extends Activity {
     @Override
     public void onPause() {
         super.onPause();
-        DotEngine.getInstance().stopPreview();//暂停预览
+        DotEngine.getInstance().onPause();
 
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        DotEngine.getInstance().onResume();//中途恢复
+        DotEngine.getInstance().onResume();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         videoLayout.removeAllViews();
-        DotEngine.getInstance().leaveRoom();//立刻房间,回收资源
+        DotEngine.getInstance().onDestroy();//立刻房间,回收资源
+    }
+
+
+    private void addVideo(String user, SurfaceView view) {
+        //九宫格布局
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+
+        int size = videoLayout.getChildCount();
+        int pw = (int) (displayMetrics.widthPixels * 0.5f);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(pw, pw);
+
+        layoutParams.leftMargin = (size % 2) * pw;
+        layoutParams.topMargin = (size / 2) * pw;
+
+        videoLayout.addView(view,layoutParams);
+
+
+        view.setZOrderOnTop(true);
+
     }
 
 
@@ -282,4 +293,17 @@ public class CropVideoActivity extends Activity {
         Log.d(TAG,"updateFrameLayout");
 
     }
+
+
+    private void showTip(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(CropVideoActivity.this, msg, Toast.LENGTH_SHORT).show();
+                textView.setText(msg + "\n");
+            }
+        });
+    }
+
+
 }
