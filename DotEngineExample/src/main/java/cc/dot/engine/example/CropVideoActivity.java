@@ -15,9 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cc.dot.engine.DotEngine;
-import cc.dot.engine.Engine;
 import cc.dot.engine.listener.DotEngineListener;
 import cc.dot.engine.type.DotEngineErrorType;
+import cc.dot.engine.type.DotEngineStatus;
 import cc.dot.engine.type.DotEngineVideoProfileType;
 import cc.dot.engine.type.DotEngineWarnType;
 
@@ -31,6 +31,8 @@ public class CropVideoActivity extends Activity {
     private LinearLayout linearLayout;
     private String token;
     private FrameLayout videoLayout;
+
+    private DotEngine  mDotEngine;
 
 
     @Override
@@ -59,12 +61,12 @@ public class CropVideoActivity extends Activity {
                 if (v.getTag() == null) {
                     initView();
                 } else {
-                    DotEngine.getInstance().leaveRoom();
+                    mDotEngine.leaveRoom();
                     linearLayout.setVisibility(View.GONE);
                     linearLayout.removeAllViews();
                     videoLayout.removeAllViews();
 
-                    DotEngine.getInstance().stopLocalMedia();
+                    mDotEngine.stopLocalMedia();
                 }
 
                 v.setTag(v.getTag() == null ? true : null);
@@ -77,16 +79,18 @@ public class CropVideoActivity extends Activity {
 
     private void initView() {
 
+        textView = (TextView) findViewById(R.id.textView);
+
         initAndStartPreview();
         linearLayout.setVisibility(View.VISIBLE);
 
-        textView = (TextView) findViewById(R.id.textView);
+
 
         button = (Button) findViewById(R.id.btnSwitchCamera);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DotEngine.getInstance().switchCamera();
+                mDotEngine.switchCamera();
 
             }
         });
@@ -95,7 +99,7 @@ public class CropVideoActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                DotEngine.getInstance().enableVideo(v.getTag() != null);
+                mDotEngine.muteLocalVideo(v.getTag() != null);
                 ((Button) v).setText(v.getTag() == null ? "enable video" : "disable video");
                 v.setTag(v.getTag() == null ? true : null);
 
@@ -107,7 +111,7 @@ public class CropVideoActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                DotEngine.getInstance().enableAudio(v.getTag() != null);
+                mDotEngine.muteLocalAudio(v.getTag() != null);
                 ((Button) v).setText(v.getTag() == null ? "enable audio" : "disable audio");
                 v.setTag(v.getTag() == null ? true : null);
 
@@ -118,7 +122,7 @@ public class CropVideoActivity extends Activity {
         findViewById(R.id.speakerphoneOn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DotEngine.getInstance().enableSpeakerphone(v.getTag() != null);
+                mDotEngine.enableSpeakerphone(v.getTag() != null);
                 ((Button) v).setText(v.getTag() == null ? "enable speakerphone" : "disable speakerphone");
                 v.setTag(v.getTag() == null ? true : null);
             }
@@ -128,15 +132,11 @@ public class CropVideoActivity extends Activity {
     }
 
     private void initAndStartPreview() {
-        DotEngine.getInstance().sharedInstanceWithListener(this,
-                new DotEngineListener() {
+
+        mDotEngine = DotEngine.instance(this.getApplicationContext(), new DotEngineListener() {
                     @Override
                     public void onJoined(final String user) {
                         showToast(user + " join room  可以拖动视频看看效果");
-                        if (user.equals(DotEngine.getInstance().getCurrentUser())) {
-                            return;
-                        }
-
 
                     }
 
@@ -157,24 +157,7 @@ public class CropVideoActivity extends Activity {
                     }
 
 
-                    @Override
-                    public void onInitPrepared() {
-                        DotEngine.getInstance().startLocalMedia();
-                        DotEngine.getInstance().joinRoom(token);
-                    }
 
-
-                    @Override
-                    public void onEnableAudio(boolean enable, String user) {
-                        showToast(user + " audio  " + (enable ? " enable :" : " disable "));
-                    }
-
-                    @Override
-                    public void onEnableVideo(boolean enable, String user) {
-                        showToast(user + " video " + (enable ? " enable :" : " disable "));
-
-
-                    }
 
                     @Override
                     public void onAddLocalView(SurfaceView surfaceView) {
@@ -205,12 +188,20 @@ public class CropVideoActivity extends Activity {
                     }
 
 
-                });
+
+                    @Override
+                    public void onStateChange(DotEngineStatus dotEngineStatus) {
+
+                        showToast("stateChange " + dotEngineStatus);
+                    }
 
 
-        DotEngine.getInstance().setupVideoProfile(DotEngineVideoProfileType.DotEngine_VideoProfile_360P);
+        });
 
-        DotEngine.getInstance().startInit();
+
+        mDotEngine.setupVideoProfile(DotEngineVideoProfileType.DotEngine_VideoProfile_360P);
+        mDotEngine.startLocalMedia();
+        mDotEngine.joinRoom(token);
 
     }
 
@@ -221,9 +212,7 @@ public class CropVideoActivity extends Activity {
             public void run() {
                 Toast.makeText(CropVideoActivity.this, msg, Toast.LENGTH_SHORT).show();
                 textView.setText(msg + "\n");
-                for (String use : DotEngine.getInstance().getUsers()) {
-                    textView.append(use + "\n");
-                }
+
             }
         });
     }
@@ -231,21 +220,31 @@ public class CropVideoActivity extends Activity {
     @Override
     public void onPause() {
         super.onPause();
-        DotEngine.getInstance().onPause();
+
+        if (mDotEngine != null){
+            mDotEngine.onPause();
+        }
 
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        DotEngine.getInstance().onResume();
+
+        if (mDotEngine != null){
+            mDotEngine.onResume();
+        }
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         videoLayout.removeAllViews();
-        DotEngine.getInstance().onDestroy();//立刻房间,回收资源
+        if (mDotEngine!=null){
+            mDotEngine.onDestroy();
+        }
+
     }
 
 
