@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import cc.dot.engine.DotEngine;
 import cc.dot.engine.listener.TokenCallback;
+import cc.dot.engine.utils.PermissionsUtils;
 
 
 
@@ -39,6 +40,8 @@ public class FirstActivity extends Activity {
 
     private String  mUserid;
 
+    private PermissionsUtils permissionsUtils;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +51,17 @@ public class FirstActivity extends Activity {
 
         mRooText = (TextView)findViewById(R.id.room);
 
-
+        permissionsUtils = new PermissionsUtils();
 
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        permissionsUtils.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 
     private void check() {
 
@@ -58,8 +69,23 @@ public class FirstActivity extends Activity {
             return;
         }
 
-            findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
+        findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
 
+
+        if (!permissionsUtils.hasPermissions(FirstActivity.this)) {
+            permissionsUtils.requestPermissions(FirstActivity.this, new PermissionsUtils.Callback() {
+                @Override
+                public void onSuccess() {
+
+                    Toast.makeText(FirstActivity.this, "got permission", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(String msg) {
+                    Toast.makeText(FirstActivity.this, msg, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
             // we just disable this
 
