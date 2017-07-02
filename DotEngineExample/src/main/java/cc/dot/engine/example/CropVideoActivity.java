@@ -15,7 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cc.dot.engine.DotEngine;
+import cc.dot.engine.DotStream;
+import cc.dot.engine.DotView;
 import cc.dot.engine.listener.DotEngineListener;
+import cc.dot.engine.listener.DotStreamListener;
 import cc.dot.engine.type.DotEngineErrorType;
 import cc.dot.engine.type.DotEngineStatus;
 import cc.dot.engine.type.DotEngineVideoProfileType;
@@ -33,6 +36,7 @@ public class CropVideoActivity extends Activity {
     private FrameLayout videoLayout;
 
     private DotEngine  mDotEngine;
+    private DotStream localStream;
 
 
     @Override
@@ -60,20 +64,33 @@ public class CropVideoActivity extends Activity {
                 ((Button) v).setText(v.getTag() != null ? "join room" : "leave room");
                 if (v.getTag() == null) {
                     initView();
+                    mDotEngine.joinRoom(token);
                 } else {
                     mDotEngine.leaveRoom();
                     linearLayout.setVisibility(View.GONE);
                     linearLayout.removeAllViews();
                     videoLayout.removeAllViews();
 
-                    mDotEngine.stopLocalMedia();
                 }
 
                 v.setTag(v.getTag() == null ? true : null);
             }
         });
 
-        //DotEngine.getInstance().setCaptureMode(DotEngine.DotEngineCaptureMode.DotEngine_Capture_Default);
+
+        mDotEngine = DotEngine.builder().setContext(this.getApplicationContext())
+                    .setDotEngineListener(dotEngineListener).build();
+
+
+        localStream = DotStream.builder(this.getApplicationContext())
+                    .setAudio(true).setVideo(true).build();
+
+
+        // 开启视频预览  也可以通过onAddLocalStream 来预览
+
+        localStream.setupLocalMedia();
+
+        addVideo(null,localStream.getView());
 
     }
 
@@ -81,42 +98,9 @@ public class CropVideoActivity extends Activity {
 
         textView = (TextView) findViewById(R.id.textView);
 
-        initAndStartPreview();
         linearLayout.setVisibility(View.VISIBLE);
 
 
-
-        button = (Button) findViewById(R.id.btnSwitchCamera);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDotEngine.switchCamera();
-
-            }
-        });
-
-        findViewById(R.id.btnSwitchEnableVideo).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                mDotEngine.muteLocalVideo(v.getTag() != null);
-                ((Button) v).setText(v.getTag() == null ? "enable video" : "disable video");
-                v.setTag(v.getTag() == null ? true : null);
-
-            }
-        });
-
-
-        findViewById(R.id.btnSwitchEnableAudio).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                mDotEngine.muteLocalAudio(v.getTag() != null);
-                ((Button) v).setText(v.getTag() == null ? "enable audio" : "disable audio");
-                v.setTag(v.getTag() == null ? true : null);
-
-            }
-        });
 
 
         findViewById(R.id.speakerphoneOn).setOnClickListener(new View.OnClickListener() {
@@ -131,79 +115,6 @@ public class CropVideoActivity extends Activity {
 
     }
 
-    private void initAndStartPreview() {
-
-        mDotEngine = DotEngine.instance(this.getApplicationContext(), new DotEngineListener() {
-                    @Override
-                    public void onJoined(final String user) {
-                        showToast(user + " join room  可以拖动视频看看效果");
-
-                    }
-
-                    @Override
-                    public void onLeave(String user) {
-                        showToast(user + " leave room");
-
-                    }
-
-                    @Override
-                    public void onOccurError(DotEngineErrorType errorType) {
-                        showToast("" + errorType);
-                    }
-
-                    @Override
-                    public void onWarning(DotEngineWarnType dotEngineWarnType) {
-
-                    }
-
-
-
-
-                    @Override
-                    public void onAddLocalView(SurfaceView surfaceView) {
-
-                        addVideo(null,surfaceView);
-                    }
-
-                    @Override
-                    public void onAddRemoteView(String s, SurfaceView surfaceView) {
-
-                        addVideo(s, surfaceView);
-                    }
-
-                    @Override
-                    public void onRemoveLocalView(SurfaceView surfaceView) {
-
-                        videoLayout.removeView(surfaceView);
-
-                        updateFrameLayout();
-                    }
-
-                    @Override
-                    public void onRemoveRemoteView(String s, SurfaceView surfaceView) {
-
-                        videoLayout.removeView(surfaceView);
-
-                        updateFrameLayout();
-                    }
-
-
-
-                    @Override
-                    public void onStateChange(DotEngineStatus dotEngineStatus) {
-
-                        showToast("stateChange " + dotEngineStatus);
-                    }
-
-
-        });
-
-
-        mDotEngine.setupVideoProfile(DotEngineVideoProfileType.DotEngine_VideoProfile_360P);
-        mDotEngine.startLocalMedia();
-        mDotEngine.joinRoom(token);
-
-    }
 
 
     private void showToast(final String msg) {
@@ -248,7 +159,7 @@ public class CropVideoActivity extends Activity {
     }
 
 
-    private void addVideo(String user, SurfaceView view) {
+    private void addVideo(String user, View view) {
         //九宫格布局
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 
@@ -262,7 +173,6 @@ public class CropVideoActivity extends Activity {
         videoLayout.addView(view,layoutParams);
 
 
-        view.setZOrderOnTop(true);
 
     }
 
@@ -303,6 +213,82 @@ public class CropVideoActivity extends Activity {
             }
         });
     }
+
+
+    private DotEngineListener dotEngineListener =  new DotEngineListener() {
+
+        @Override
+        public void onJoined(String s) {
+
+            if (s.equalsIgnoreCase(localStream.getPeerId())){
+
+                // 已经加入房间成功
+
+                mDotEngine.addStream(localStream);
+
+            }
+        }
+
+        @Override
+        public void onLeave(String s) {
+
+            showTip(s + " leave room");
+        }
+
+        @Override
+        public void onOccurError(DotEngineErrorType dotEngineErrorType) {
+
+            showTip("" + dotEngineErrorType);
+        }
+
+
+        @Override
+        public void onWarning(DotEngineWarnType dotEngineWarnType) {
+
+        }
+
+        @Override
+        public void onAddLocalStream(DotStream dotStream) {
+
+            // todo nothing
+        }
+
+        @Override
+        public void onRemoveLocalStream(DotStream dotStream) {
+
+            // todo  remove the view or keep the view 
+//            DotView view = dotStream.getView();
+//            videoLayout.removeView(view);
+//            updateFrameLayout();
+        }
+
+        @Override
+        public void onAddRemoteStream(DotStream dotStream) {
+
+            addVideo(dotStream.getPeerId(), dotStream.getView());
+        }
+
+        @Override
+        public void onRemoveRemoteStream(DotStream dotStream) {
+
+            DotView view = dotStream.getView();
+
+            videoLayout.removeView(view);
+
+            updateFrameLayout();
+
+        }
+
+        @Override
+        public void onStateChange(DotEngineStatus dotEngineStatus) {
+
+            showTip("当前的dotEngine 的状态是  -->  " + dotEngineStatus);
+        }
+    };
+
+
+
+
 
 
 }
