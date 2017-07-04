@@ -69,7 +69,7 @@ public class CropVideoActivity extends Activity {
                     mDotEngine.leaveRoom();
                     linearLayout.setVisibility(View.GONE);
                     linearLayout.removeAllViews();
-                    videoLayout.removeAllViews();
+                    //videoLayout.removeAllViews();
 
                 }
 
