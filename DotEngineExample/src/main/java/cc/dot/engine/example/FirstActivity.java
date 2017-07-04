@@ -106,6 +106,7 @@ public class FirstActivity extends Activity {
 
                         Intent intent = new Intent(FirstActivity.this, CropVideoActivity.class);
                         intent.putExtra("token", token);
+                        intent.putExtra("userid",mUserid);
                         startActivity(intent);
                         finish();
                     }

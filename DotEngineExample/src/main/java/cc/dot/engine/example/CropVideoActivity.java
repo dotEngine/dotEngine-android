@@ -37,6 +37,7 @@ public class CropVideoActivity extends Activity {
 
     private DotEngine  mDotEngine;
     private DotStream localStream;
+    private String  userid;
 
 
     @Override
@@ -55,6 +56,7 @@ public class CropVideoActivity extends Activity {
 
 
         this.token = getIntent().getStringExtra("token");
+
 
         linearLayout = (LinearLayout) findViewById(R.id.parentLayout);
 
@@ -220,13 +222,6 @@ public class CropVideoActivity extends Activity {
         @Override
         public void onJoined(String s) {
 
-            if (s.equalsIgnoreCase(localStream.getPeerId())){
-
-                // 已经加入房间成功
-
-                mDotEngine.addStream(localStream);
-
-            }
         }
 
         @Override
@@ -283,6 +278,12 @@ public class CropVideoActivity extends Activity {
         public void onStateChange(DotEngineStatus dotEngineStatus) {
 
             showTip("当前的dotEngine 的状态是  -->  " + dotEngineStatus);
+
+            if (dotEngineStatus == DotEngineStatus.DotEngineStatusConnected){
+
+                mDotEngine.addStream(localStream);
+
+            }
         }
     };
 
