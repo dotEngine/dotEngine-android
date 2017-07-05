@@ -1,0 +1,9 @@
+
+
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.dotEngine'
+
+configurations.maybeCreate("default")
+artifacts.add("default", file('DotEngine-release.aar'))
+
+

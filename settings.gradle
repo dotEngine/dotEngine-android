@@ -1,1 +1,1 @@
-include ':DotEngineExample'
+include ':DotEngineExample', ':DotEngine-release'
