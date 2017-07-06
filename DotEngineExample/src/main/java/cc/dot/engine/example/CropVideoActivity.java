@@ -71,8 +71,6 @@ public class CropVideoActivity extends Activity {
                     mDotEngine.leaveRoom();
                     linearLayout.setVisibility(View.GONE);
                     linearLayout.removeAllViews();
-                    //videoLayout.removeAllViews();
-
                 }
 
                 v.setTag(v.getTag() == null ? true : null);
@@ -85,14 +83,14 @@ public class CropVideoActivity extends Activity {
 
 
         localStream = DotStream.builder(this.getApplicationContext())
-                    .setAudio(true).setVideo(true).build();
+                    .setAudio(true)
+                    .setVideo(true)
+                    .build();
 
 
         // 开启视频预览  也可以通过onAddLocalStream 来预览
 
-        localStream.setupLocalMedia();
-
-        addVideo(null,localStream.getView());
+        addVideo(localStream.getStreamId(),localStream.getView());
 
     }
 
@@ -101,8 +99,6 @@ public class CropVideoActivity extends Activity {
         textView = (TextView) findViewById(R.id.textView);
 
         linearLayout.setVisibility(View.VISIBLE);
-
-
 
 
         findViewById(R.id.speakerphoneOn).setOnClickListener(new View.OnClickListener() {
@@ -135,7 +131,7 @@ public class CropVideoActivity extends Activity {
         super.onPause();
 
         if (mDotEngine != null){
-            mDotEngine.onPause();
+            mDotEngine.pause();
         }
 
     }
@@ -145,7 +141,7 @@ public class CropVideoActivity extends Activity {
         super.onResume();
 
         if (mDotEngine != null){
-            mDotEngine.onResume();
+            mDotEngine.resume();
         }
 
     }
@@ -153,9 +149,19 @@ public class CropVideoActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         videoLayout.removeAllViews();
+
+
+        // 重要  离开的时候需要 destroy
+
         if (mDotEngine!=null){
-            mDotEngine.onDestroy();
+            mDotEngine.destroy();
+        }
+
+        // need destroy after dotEngine
+        if (localStream != null){
+            localStream.destroy();
         }
 
     }
@@ -215,6 +221,7 @@ public class CropVideoActivity extends Activity {
             }
         });
     }
+
 
 
     private DotEngineListener dotEngineListener =  new DotEngineListener() {
@@ -286,6 +293,7 @@ public class CropVideoActivity extends Activity {
             }
         }
     };
+
 
 
 
