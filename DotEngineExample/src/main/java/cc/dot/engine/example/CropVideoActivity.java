@@ -87,6 +87,13 @@ public class CropVideoActivity extends Activity {
                     .setVideo(true)
                     .build();
 
+        localStream.enableFaceBeauty(true);
+
+        // beauty level  (0.0f - 1.0f)  default 0.5f
+        localStream.setBeautyLevel(0.7f);
+
+        // bright level (0.0f - 1.0f )  default 0.5f
+        localStream.setBrightLevel(0.6f);
 
         // 开启视频预览  也可以通过onAddLocalStream 来预览
 
