@@ -100,7 +100,7 @@ public class FirstActivity extends Activity {
 
 
 
-                DotEngine.generateTestToken(DotEngineConfig.APP_KEY, DotEngineConfig.APP_SECRET, mRoom, mUserid, new TokenCallback() {
+                DotEngine.generateTestToken(DotEngineConfig.TOKEN_URL, DotEngineConfig.APP_SECRET, mRoom, mUserid, new TokenCallback() {
                     @Override
                     public void onSuccess(String token) {
 
