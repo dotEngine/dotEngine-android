@@ -85,15 +85,16 @@ public class CropVideoActivity extends Activity {
         localStream = DotStream.builder(this.getApplicationContext())
                     .setAudio(true)
                     .setVideo(true)
+                    .setVideoProfile(DotEngineVideoProfileType.DotEngine_VideoProfile_240P_3)
                     .build();
 
-        localStream.enableFaceBeauty(true);
+        //localStream.enableFaceBeauty(true);
 
         // beauty level  (0.0f - 1.0f)  default 0.5f
-        localStream.setBeautyLevel(0.7f);
+        //localStream.setBeautyLevel(0.7f);
 
         // bright level (0.0f - 1.0f )  default 0.5f
-        localStream.setBrightLevel(0.6f);
+        //localStream.setBrightLevel(0.6f);
 
         // 开启视频预览  也可以通过onAddLocalStream 来预览
 
@@ -161,7 +162,6 @@ public class CropVideoActivity extends Activity {
 
 
         // 重要  离开的时候需要 destroy
-
         if (mDotEngine!=null){
             mDotEngine.destroy();
         }
@@ -186,8 +186,6 @@ public class CropVideoActivity extends Activity {
         layoutParams.topMargin = (size / 2) * pw;
 
         videoLayout.addView(view,layoutParams);
-
-
 
     }
 
