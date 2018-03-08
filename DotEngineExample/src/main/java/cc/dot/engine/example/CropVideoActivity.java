@@ -17,6 +17,7 @@ import android.widget.Toast;
 import cc.dot.engine.DotEngine;
 import cc.dot.engine.DotStream;
 import cc.dot.engine.DotView;
+import cc.dot.engine.audio.DotAudioManager;
 import cc.dot.engine.listener.DotEngineListener;
 import cc.dot.engine.listener.DotStreamListener;
 import cc.dot.engine.type.DotEngineErrorType;
@@ -296,6 +297,11 @@ public class CropVideoActivity extends Activity {
                 mDotEngine.addStream(localStream);
 
             }
+        }
+
+        @Override
+        public void onAudioDeviceChanged(DotAudioManager.AudioDevice device) {
+
         }
     };
 
