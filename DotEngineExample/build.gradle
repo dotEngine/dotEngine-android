@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 26
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "cc.dot.engine.example"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -33,9 +33,9 @@ allprojects {
 
 dependencies {
 
-    compile(name:'DotEngine-release', ext:'aar')
-    compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.squareup.okhttp3:okhttp:3.6.0'
-    compile 'com.orhanobut:logger:2.1.1'
+    implementation(name:'DotEngine-release', ext:'aar')
+    implementation 'com.android.support:appcompat-v7:24.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.6.0'
+    implementation 'com.orhanobut:logger:2.1.1'
 
 }
